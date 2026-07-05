@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sad3d</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #0e1217;
+    --bg-elevated: #1a1e25;
+    --text: #dae3f6;
+    --text-muted: #606571;
+    --accent: #93b9ff;
+    --line: #262b33;
+    --header-h: 60px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    padding-top: var(--header-h);
+  }
+
+  .wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .desktop-only {
+    display: inline;
+  }
+
+  #page-loader {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 999;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #page-loader.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loader-text {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .caps-link {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .caps-text {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .caps-link:hover { color: var(--accent); }
+
+  /*Header*/
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-h);
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    z-index: 100;
+  }
+
+  .header-row {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+  }
+
+  nav { display: flex; gap: 32px; }
+
+  .cover {
+    position: relative;
+    width: 100%;
+    height: 48vh;
+    min-height: 320px;
+    max-height: 480px;
+    overflow: hidden;
+    background: var(--bg-elevated);
+  }
+
+  .cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, transparent 10%, var(--bg) 100%);
+    pointer-events: none;
+  }
+
+  .cover-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+
+  .cover-slide.active { opacity: 1; }
+
+  .cover-slide img,
+  .cover-slide video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .intro {
+    /*padding: 48px 24px 0px;*/
+    margin-top: -200px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .intro h1 {
+    color: var(--accent);
+    font-family: 'EB Garamond', serif;
+    font-weight: 600;
+    font-size: 40px;
+    font-style: normal;
+    letter-spacing: 0.015em;
+    margin-bottom: 16px;
+  }
+
+  .intro .handle {
+    color: var(--accent);
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .intro .role {
+    color: var(--text);
+    font-size: 18px;
+  }
+
+  /* sections */
+  section { padding: 140px 24px; }
+  section { scroll-margin-top: calc(var(--header-h) + 24px); }
+  section > .wrap { padding: 0;}
+
+  h2 {
+    font-family: 'EB Garamond', serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: 0.015em;
+    color: var(--accent);
+    margin-top: 32px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 2;
+    /*text-transform: uppercase;*/
+  }
+
+  /* games grid */
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 28px 24px;
+  }
+
+  .game-card { display: block; text-decoration: none; color: var(--text); }
+
+  .game-thumb {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--bg-elevated);
+    border-radius: 3px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2px;
+  }
+
+  .game-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    filter: brightness(1);
+    transition: filter 0.35s ease;
+  }
+
+  .game-card:hover .game-thumb img {
+    filter: brightness(1.2);
+  }
+
+  .game-thumb span {
+    font-family: 'EB Garamond', serif;
+    font-weight: 600;
+    font-size: 24px;
+    color: var(--text-muted);
+  }
+
+  .game-card h3 {
+    font-family: 'EB Garamond', serif;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    font-size: 24px;
+    margin-top: 14px;
+    transition: color 0.2s ease;
+  }
+
+  .game-card:hover h3 {
+    color: var(--accent);
+  }
+
+  .game-card.neyasnoe:hover h3 {
+    color: #93b9ff;
+  }
+
+  .game-card.its-winter:hover h3 {
+    color: #ffdfa0;
+  }
+
+  .game-card.routine-feat:hover h3 {
+    color: #d5a9ff;
+  }
+
+  .game-card.other-experiments:hover h3 {
+    color: #b2ffc2;
+  }
+
+  .game-card p {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /*Press and Interviews*/
+  .press-text p {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .press-text a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .press-text a:hover {
+    color: var(--accent);
+  }
+
+  .press-source {
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+
+  .press-subheading {
+    font-family: 'EB Garamond', serif;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    font-size: 24px;
+    margin: 36px 0 18px;
+    transition: color 0.2s ease;
+  }
+
+  /*About Sashenka*/
+  .about-text p {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .about-text p:last-child, .press-text p:last-child { margin-bottom: 0; }
+
+  /*Contacts*/
+  .contacts-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 18px;
+    margin-top: 8px;
+  }
+
+  .contacts-row a {
+    font-size: 18px;
+    color: var(--text);
+    text-decoration: none;
+    padding: 0;
+  }
+
+  .contacts-row a:hover {
+    color: var(--accent);
+  }
+
+  .contacts-row a:not(:last-child)::after {
+    content: "|";
+    margin-left: 18px;
+    color: var(--line);
+  }
+
+  .email-line { font-size: 15px; color: var(--text-muted); }
+  .email-line a { color: var(--text); text-decoration: none; }
+  .email-line a:hover { color: var(--accent); }
+
+  section:last-of-type { padding-bottom: 64px; }
+
+  /*Footer*/
+  footer {
+    height: var(--header-h);
+    border-top: 1px solid var(--line);
+  }
+
+  .footer-row {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+  }
+
+  .footer-right { display: flex; align-items: center; gap: 48px; }
+
+  /*For Mobile*/
+  @media (max-width: 768px) {
+  :root { --header-h: 104px; }
+
+  .cover {
+    height: 16vh;
+    min-height: 240px;
+    max-height: 320px;
+  }
+
+  .header-row {
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 18px;
+  }
+
+  .intro h1 {
+    font-size: 32px;
+  }
+
+  nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 16px;
+  }
+
+  section { padding: 90px 18px; }
+  section:last-of-type { padding-bottom: 100px; }
+  .intro { padding: 40px 18px 16px; }
+
+  footer { height: auto; }
+
+  .footer-row {
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px;
+  }
+
+  .footer-right { flex-direction: column; gap: 8px; }
+
+  .desktop-only {
+    display: none;
+  }
+
+  }
+  
+</style>
+</head>
+<body id="top">
+
+<div id="page-loader">
+  <span class="loader-text">Loading<span id="loader-dots"></span></span>
+</div>
+
+<header class="site-header">
+  <div class="header-row">
+    <a class="caps-link" href="#top">sad3d</a>
+    <nav>
+      <a class="caps-link" href="#games">Games</a>
+      <a class="caps-link" href="#about">About</a>
+      <a class="caps-link" href="#press">Press</a>
+      <a class="caps-link" href="#contacts">Contacts</a>
+    </nav>
+  </div>
+</header>
+
+<div class="cover" id="cover">
+<!--
+  <div class="cover-slide active"><img src="assets/cover-1.jpg" alt=""></div>
+  <div class="cover-slide"><img src="assets/cover-2.jpg" alt=""></div>
+  <div class="cover-slide"><img src="assets/cover-3.jpg" alt=""></div>
+-->
+  <div class="cover-slide active">
+    <video autoplay muted loop playsinline poster="assets/neyasnoe-bg-poster.jpg">
+      <source src="assets/neyasnoe-bg.mp4" type="video/mp4">
+    </video>
+  </div>
+ 
+</div>
+
+<div class="wrap intro">
+  <h1>Alexander Ignatov · sad3d</h1>
+  <!-- <p class="handle">sad3d</p> -->
+  <p class="role">Independent Game Developer</p>
+</div>
+
+<section id="games" class="wrap">
+  <h2>Games</h2>
+  <div class="games-grid">
+
+    <a class="game-card neyasnoe" href="https://store.steampowered.com/app/2435180/Neyasnoe/" target="_blank">
+      <div class="game-thumb">
+        <img src="assets/neyasnoe-card.jpg" alt="Neyasnoe">
+      </div>
+      <h3>Neyasnoe</h3>
+      <p>A contemplative night walk through the places <br class="desktop-only"> that feel both familiar and unreal  ·  2023</p>
+    </a>
+
+    <a class="game-card its-winter" href="https://store.steampowered.com/app/1003360/SHXD_ZIMA__ITS_WINTER/" target="_blank">
+      <div class="game-thumb">
+        <img src="assets/its-winter-card-2.jpg" alt="It's Winter">
+      </div>
+      <h3>It's Winter</h3>
+      <p>A small apartment, a long winter, and snow <br class="desktop-only"> that never seems to stop  ·  2019</p>
+    </a>
+
+    <a class="game-card routine-feat" href="https://store.steampowered.com/app/1901780/Bytovoj_podvig_Routine_Feat/" target="_blank">
+      <div class="game-thumb">
+        <img src="assets/routine-feat-card.jpg" alt="Routine Feat">
+      </div>
+      <h3>Routine Feat</h3>
+      <p>Quiet summer afternoons, sunlit leaves, <br class="desktop-only"> and a book waiting to be written  ·  2022</p>
+    </a>
+
+    <a class="game-card other-experiments" href="https://sad3d.itch.io/" target="_blank">
+      <div class="game-thumb">
+          <img src="assets/other-experiments-card.jpg" alt="Other Experiments">
+      </div>
+      <h3>Other Experiments</h3>
+      <p>Smaller prototypes that didn't become <br class="desktop-only"> full games  ·  see on itch.io</p>
+    </a>
+
+  </div>
+</section>
+
+<section id="about" class="wrap">
+  <h2>About</h2>
+  <div class="about-text">
+    <p>Alexander Ignatov a.k.a. sad3d is an independent game developer creating quiet, melancholic games. Rather than chasing spectacle, he creates slow-paced interactive experiences that invite players to observe, wander, and discover the extraordinary within the familiar. He has released three commercial games on Steam, including <em>It's Winter</em>, <em>Routine Feat</em>, and <em>Neyasnoe</em>.</p>
+    <p>Alongside making games, he has spent a decade training and working as a physician — <br class="desktop-only"> a parallel path that leaves its mark on everything he makes.</p>
+    <p>Currently based in Yerevan, Armenia.</p>
+  </div>
+</section>
+
+<section id="press" class="wrap">
+  <h2>Press & Interviews</h2>
+  <div class="press-text">
+    <p>
+      <a href="https://www.rockpapershotgun.com/stumble-and-dance-through-a-bleak-post-soviet-city-in-this-excellent-new-first-person-explorer" target="_blank">
+        Stumble and dance through a bleak post-Soviet city in this excellent new first-person explorer
+      </a><br>
+      <span class="press-source">Rock, Paper, Shotgun  ·  2023</span>
+    </p>
+
+    <p>
+      <a href="https://www.theverge.com/2020/3/25/21190794/half-life-alyx-city-17-post-soviet-architecture-gaming" target="_blank">
+        Why Half-Life’s City 17 was pivotal to gaming’s post-Soviet obsession
+      </a><br>
+      <span class="press-source">The Verge  ·  2020</span>
+    </p>
+
+    <p>
+      <a href="https://www.rockpapershotgun.com/its-summer-in-routine-feat-from-the-maker-of-its-winter" target="_blank">
+        It's summer in Routine Feat, from the maker of It's Winter
+      </a><br>
+      <span class="press-source">Rock, Paper, Shotgun  ·  2019</span>
+    </p>
+
+    <p>
+      <a href="https://www.rockpapershotgun.com/the-its-winter-and-routine-feat-developer-explains-russian-sadness-and-powerful-moods" target="_blank">
+        The It's Winter and Routine Feat developer explains Russian sadness and powerful moods
+      </a><br>
+      <span class="press-source">Rock, Paper, Shotgun  ·  2019</span>
+    </p>
+
+    <p>
+      <a href="https://www.rockpapershotgun.com/its-winter-russian-apartment-game" target="_blank">
+        Explore, clean, and cook on a Russian night in It's Winter
+      </a><br>
+      <span class="press-source">Rock, Paper, Shotgun  ·  2019</span>
+    </p>
+
+    <!-- <p>
+      <a href="https://www.killscreen.com/live-life-lonely-introvert-hikikimori-simulator/" target="_blank">
+        Live the life of a lonely introvert in a hikikimori simulator
+      </a><br>
+      <span class="press-source">Killscreen  ·  2016</span>
+    </p> -->
+
+
+    <h3 class="press-subheading">Russian Press</h3>
+
+    <p>
+      <a href="https://skillbox.ru/media/gamedev/pryamoy-udar-v-serdtse-beseda-s-avtorami-neyasnogo-ob-iskusstve-svete-i-paketakh-v-nebe/" target="_blank">
+        Беседа с авторами «Неясного» — об искусстве, свете и пакетах в небе
+      </a><br>
+      <span class="press-source">Skillbox Media  ·  2023</span>
+    </p>
+
+    <p>
+      <a href="https://go.zvuk.com/interview/ne-nado-uglublyatsya-sozdateli-igry-neyasnoe-pro-budushee-indi-lishnie-smysly-i-cifrovuyu-zavisimost.htm" target="_blank">
+        Создатели игры «Неясное» про будущее инди, лишние смыслы и цифровую зависимость
+      </a><br>
+      <span class="press-source">Звук Медиа  ·  2023</span>
+    </p>
+
+    <p>
+      <a href="https://go.zvuk.com/stati/entuziazm-i-vera-v-ideyu-na-chem-postroen-saund-dizain-v-rossiiskom-igroprome.htm" target="_blank">
+        Энтузиазм и вера в идею: на чем построен саунд-дизайн в российском игропроме
+      </a><br>
+      <span class="press-source">Звук Медиа  ·  2023</span>
+    </p>
+
+    <p>
+      <a href="https://knife.media/russian-indie-devs/" target="_blank">
+        Кто делает инди-игры в России
+      </a><br>
+      <span class="press-source">Нож  ·  2020</span>
+    </p>
+
+    <p>
+      <a href="https://daily.afisha.ru/culture/11588-pochemu-igra-pro-russian-toska-voobsche-ne-prikol/" target="_blank">
+        Почему игра про russian toska вообще не прикол
+      </a><br>
+      <span class="press-source">Афиша  ·  2019</span>
+    </p>
+
+    <p>
+      <a href="https://daily.afisha.ru/culture/11503-iz-chego-sostoit-mir-panelnogo-doma-obyasnyayut-sozdateli-igry-shhd-zima/" target="_blank">
+        10 деталей симулятора панелек «ШХД: ЗИМА», о которых вы могли не знать
+      </a><br>
+      <span class="press-source">Афиша  ·  2019</span>
+    </p>
+
+    <p>
+      <a href="https://dtf.ru/indie/42841-grustinka-po-cene-pivasa-v-bare-beseda-s-razrabotchikom-its-winter-igry-o-panelkah-i-zimnei-toske" target="_blank">
+        Беседа с разработчиком It's Winter, игры о панельках и зимней тоске
+      </a><br>
+      <span class="press-source">DTF  ·  2019</span>
+    </p>
+  </div>
+</section>
+
+<section id="contacts" class="wrap">
+  <h2>Contacts</h2>
+  <!-- <p class="email-line">e-mail: <a href="mailto:alex.igntv@gmail.com">alex.igntv@gmail.com</a></p> -->
+  <div class="contacts-row">
+    <a href="mailto:alex.igntv@gmail.com">e-mail</a>
+    <a href="http://x.com/alex_igntv" target="_blank">x / twitter</a>
+    <a href="http://t.me/sad3d" target="_blank">telegram</a>
+    <a href="http://instagram.com/sad3d" target="_blank">instagram</a>
+    <a href="https://www.youtube.com/c/sad3d" target="_blank">youtube</a>
+    <a href="https://bsky.app/profile/sad3d.bsky.social" target="_blank">bluesky</a>
+    <a href="https://vk.com/sad3d" target="_blank">vk</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-row">
+    <a class="caps-link" href="#top">sad3d</a>
+    <div class="footer-right">
+      <!-- <a
+        class="caps-link"
+        href="files/alexander-ignatov-cv.pdf"
+        download="Alexander Ignatov CV.pdf"
+        target="_blank">
+        Download CV
+      </a> -->
+      <span class="caps-text" style="cursor:default;">© Alexander Ignatov 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var cover = document.getElementById('cover');
+    var slides = cover.querySelectorAll('.cover-slide');
+    if (slides.length <= 1) return;
+    var i = 0;
+    setInterval(function () {
+      slides[i].classList.remove('active');
+      i = (i + 1) % slides.length;
+      slides[i].classList.add('active');
+    }, 5000);
+  })();
+
+  (function () {
+    var loader = document.getElementById('page-loader');
+    var MAX_WAIT = 3000; // на случай, если что-то реально зависнет
+
+    function allImagesLoaded() {
+      var imgs = Array.from(document.querySelectorAll('img'));
+      return Promise.all(imgs.map(function (img) {
+        if (img.complete) return Promise.resolve();
+        return new Promise(function (resolve) {
+          img.addEventListener('load', resolve);
+          img.addEventListener('error', resolve); // битая картинка не должна вешать загрузку навсегда
+        });
+      }));
+    }
+
+    var ready = Promise.all([
+      document.fonts ? document.fonts.ready : Promise.resolve(),
+      allImagesLoaded()
+    ]);
+
+    var timeout = new Promise(function (resolve) { setTimeout(resolve, MAX_WAIT); });
+    var dotsEl = document.getElementById('loader-dots');
+    var dotsInterval = setInterval(function () {
+      dotsEl.textContent = dotsEl.textContent.length >= 3 ? '' : dotsEl.textContent + '.';
+    }, 400);
+
+    Promise.race([ready, timeout]).then(function () {
+      loader.classList.add('hidden');
+      clearInterval(dotsInterval);
+    });
+  })();
+</script>
+
+</body>
+</html>
